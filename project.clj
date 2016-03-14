@@ -2,6 +2,7 @@
   :description "A data language for driving websites"
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.7.0"]
+                 [environ "1.0.2"]
                  [clj-webdriver "0.7.2-SNAPSHOT"]
                  [org.seleniumhq.selenium/selenium-server "2.47.1"]
                                   ;; Needed by core code
