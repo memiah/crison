@@ -1,3 +1,5 @@
+phantomjsdriver.log
+screenshot*
 .lein-failures
 .lein-repl-history
 resources
