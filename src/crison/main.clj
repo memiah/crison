@@ -23,7 +23,6 @@
 (defn ? [x] (is (-> driver (wc/find-element x) wc/exists?) (str "Fail on : " x)))
 
 (defn text? [x]
-  (println (wc/text (-> driver (wc/find-element (dissoc x :text?)))))
   (is (= (:text? x)
         (wc/text (-> driver (wc/find-element (dissoc x :text?)))))))
 
@@ -35,9 +34,10 @@
   (let [e (:click! x)]
     (if (string? e)
       (-> driver (wc/find-element {:id e}) wc/click)
-      (-> driver (wc/find-element e) wc/click))))
+      (-> driver (wc/find-element e) wc/click))
+    (Thread/sleep 2000)))
 
-(defmethod decode :search! [x] (wf/quick-fill-submit driver (:search! x)))
+(defmethod decode :search! [x] (wf/quick-fill-submit driver (:search! x)) (Thread/sleep 2000))
 
 (defmethod decode :title [x] (title? (:title x)))
 
