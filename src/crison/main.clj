@@ -2,6 +2,7 @@
   (:require [clojure.edn :refer [read-string]]
             [clj-time.core :as t]
             [clj-time.format :as f]
+            [clj-time.local :as l]
             [environ.core :refer [env]]
             [clojure.test :refer :all]
             ;[taoensso.truss :as truss :refer (have have! have?)]
@@ -12,8 +13,13 @@
 (System/setProperty "phantomjs.binary.path" (env :phantom-path))
 
 (def driver (wc/new-webdriver {:browser :phantomjs}))
+(def built-in-formatter (f/formatters :basic-date-time))
 
-(def f-date (f/unparse-local (f/formatter "Y-MM-dd") (t/today)))
+(defn formatlocal [n offset]
+  (let [nlocal (t/to-time-zone n (t/time-zone-for-offset offset))]
+    (f/unparse (f/formatter-local "yyyy-MM-dd_hh:mm")
+               nlocal)))
+(def f-date (formatlocal (t/now) -0))
 
 (defn title [] (wc/title driver))
 
@@ -57,7 +63,7 @@
 
 (defmethod decode :default [x] (? x))
 
-(def screenshot-file (str "screenshot_test.png"))
+(def screenshot-file (str f-date "-screenshot_test.png"))
 (defn take-screenshot
   [driver]
   (is (string? (wc/get-screenshot driver :base64)))
