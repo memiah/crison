@@ -14,11 +14,11 @@
 (def driver (wc/new-webdriver {:browser :phantomjs}))
 (def built-in-formatter (f/formatters :basic-date-time))
 
-(defn formatlocal [n offset]
-  (let [nlocal (t/to-time-zone n (t/time-zone-for-offset offset))]
+(defn date []
+  (let [nlocal (t/to-time-zone (t/now) (t/time-zone-for-offset -0))]
     (f/unparse (f/formatter-local "yyyy-MM-dd_hh:mm")
                nlocal)))
-(def f-date (formatlocal (t/now) -0))
+(def f-date (date))
 
 (defn title [] (wc/title driver))
 
@@ -62,13 +62,14 @@
 
 (defmethod decode :default [x] (? x))
 
-(def screenshot-file (str f-date "-screenshot_test.png"))
 (defn take-screenshot
-  [driver]
-  (is (string? (wc/get-screenshot driver :base64)))
-  (is (> (count (wc/get-screenshot driver :bytes)) 0))
-  (is (= (class (wc/get-screenshot driver :file)) java.io.File))
-  (is (= (class (wc/get-screenshot driver :file screenshot-file)) java.io.File))
+  [driver f]
+  (let [s-file (str (date) "_" (.getName f) "-screenshot.png")]
+    (is (string? (wc/get-screenshot driver :base64)))
+    (is (> (count (wc/get-screenshot driver :bytes)) 0))
+    (is (= (class (wc/get-screenshot driver :file)) java.io.File))
+    (is (= (class (wc/get-screenshot driver :file s-file)) java.io.File)))
+
   ;; the following will throw an exception if deletion fails, hence our test
   ;(clojure.java.io/delete-file screenshot-file)
   )
@@ -78,9 +79,9 @@
   (let [fs (file-seq (clojure.java.io/file "resources"))]
     (doseq [f (next fs)]
       (doseq [t (read-string (slurp f))] (decode t))
-      (take-screenshot driver))))
+      (take-screenshot driver f))))
 
-(def test-file (clojure.java.io/writer (str f-date "-tests.txt")))
+(def test-file (clojure.java.io/writer (str (date) "-tests.txt")))
 
 (defn -main [& args]
   (binding [*test-out* test-file]
