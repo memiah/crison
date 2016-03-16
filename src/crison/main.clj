@@ -5,7 +5,6 @@
             [clj-time.local :as l]
             [environ.core :refer [env]]
             [clojure.test :refer :all]
-            ;[taoensso.truss :as truss :refer (have have! have?)]
             [webdriver.core :as wc]
             [webdriver.form :as wf])
   (:gen-class))
@@ -74,7 +73,7 @@
   ;(clojure.java.io/delete-file screenshot-file)
   )
 
-(deftest counselling
+(deftest tests
   (wc/resize driver {:width 1024 :height 800})
   (let [tests (read-string (slurp "resources/counselling-directory.edn"))]
     (doseq [x tests] (decode x))
