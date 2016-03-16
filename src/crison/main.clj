@@ -37,7 +37,15 @@
       (-> driver (wc/find-element e) wc/click))
     (Thread/sleep 2000)))
 
-(defmethod decode :search! [x] (wf/quick-fill-submit driver (:search! x)) (Thread/sleep 2000))
+(defmethod decode :bsearch! [x]
+  (let [input (first (:bsearch! x))
+        v (:text! input)
+        srch (dissoc input :text!)]
+        (-> driver (wc/find-element srch) (wc/input-text v))
+        (-> driver (wc/find-element (last (:bsearch! x))) wc/click)))
+
+(defmethod decode :search! [x]
+  (wf/quick-fill-submit driver (:search! x)) (Thread/sleep 2000))
 
 (defmethod decode :title [x] (title? (:title x)))
 
