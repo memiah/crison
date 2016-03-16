@@ -65,10 +65,8 @@
 (defn take-screenshot
   [driver f]
   (let [s-file (str (date) "_" (.getName f) "-screenshot.png")]
-    (is (string? (wc/get-screenshot driver :base64)))
-    (is (> (count (wc/get-screenshot driver :bytes)) 0))
-    (is (= (class (wc/get-screenshot driver :file)) java.io.File))
-    (is (= (class (wc/get-screenshot driver :file s-file)) java.io.File)))
+    (wc/get-screenshot driver :file s-file))
+
 
   ;; the following will throw an exception if deletion fails, hence our test
   ;(clojure.java.io/delete-file screenshot-file)
