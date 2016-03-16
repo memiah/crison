@@ -1,5 +1,7 @@
 (ns crison.main
   (:require [clojure.edn :refer [read-string]]
+            [clj-time.core :as t]
+            [clj-time.format :as f]
             [environ.core :refer [env]]
             [clojure.test :refer :all]
             ;[taoensso.truss :as truss :refer (have have! have?)]
@@ -10,6 +12,8 @@
 (System/setProperty "phantomjs.binary.path" (env :phantom-path))
 
 (def driver (wc/new-webdriver {:browser :phantomjs}))
+
+(def f-date (f/unparse-local (f/formatter "Y-MM-dd") (t/today)))
 
 (defn title [] (wc/title driver))
 
@@ -37,12 +41,12 @@
       (-> driver (wc/find-element e) wc/click))
     (Thread/sleep 2000)))
 
-(defmethod decode :bsearch! [x]
-  (let [input (first (:bsearch! x))
+(defmethod decode :submit! [{:keys [submit!]}]
+  (let [input (first submit!)
         v (:text! input)
         srch (dissoc input :text!)]
         (-> driver (wc/find-element srch) (wc/input-text v))
-        (-> driver (wc/find-element (last (:bsearch! x))) wc/click)))
+        (-> driver (wc/find-element (last submit!)) wc/click)))
 
 (defmethod decode :search! [x]
   (wf/quick-fill-submit driver (:search! x)) (Thread/sleep 2000))
@@ -68,10 +72,9 @@
   (wc/resize driver {:width 1024 :height 800})
   (let [tests (read-string (slurp "resources/counselling-directory.edn"))]
     (doseq [x tests] (decode x))
-    (take-screenshot driver)
-    ))
+    (take-screenshot driver)))
 
-(def test-file (clojure.java.io/writer "tests.txt"))
+(def test-file (clojure.java.io/writer (str f-date "-tests.txt")))
 
 (defn -main [& args]
   (binding [*test-out* test-file]
