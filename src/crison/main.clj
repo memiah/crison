@@ -75,9 +75,10 @@
 
 (deftest tests
   (wc/resize driver {:width 1024 :height 800})
-  (let [tests (read-string (slurp "resources/counselling-directory.edn"))]
-    (doseq [x tests] (decode x))
-    (take-screenshot driver)))
+  (let [fs (file-seq (clojure.java.io/file "resources"))]
+    (doseq [f (next fs)]
+      (doseq [t (read-string (slurp f))] (decode t))
+      (take-screenshot driver))))
 
 (def test-file (clojure.java.io/writer (str f-date "-tests.txt")))
 
