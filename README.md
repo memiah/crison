@@ -18,5 +18,6 @@ A data language for mining data out of websites and webservices (maybe others in
 {:tag :h2, :text "Home"}
 {:click! "magicButton"}
 ```
+* Place crison data file in a 'resources' directory in the root of this project
 * Edit the value of PHANTOM_PATH in the run.sh file
 * Execute `./run.sh` in your shell in the root directory of this installation
