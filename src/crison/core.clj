@@ -1,13 +1,15 @@
 (ns crison.core
   (:require [environ.core :refer [env]]
-            [clojure.test :refer [deftest is]]
+            [clojure.test :refer [deftest is run-tests *test-out*]]
             [clj-time.core :as t]
             [clj-time.format :as f]
             [webdriver.core :as wc]
             [webdriver.form :as wf]
-            [clojure.java.io :refer [file]]))
+            [clojure.java.io :refer [file writer]]))
 
 (System/setProperty "phantomjs.binary.path" (env :phantom-path))
+
+(def ^:dynamic *data-dir*)
 
 (def driver (wc/new-webdriver {:browser :phantomjs}))
 (def built-in-formatter (f/formatters :basic-date-time))
@@ -71,7 +73,12 @@
 
 (deftest tests
   (wc/resize driver {:width 1024 :height 800})
-  (let [fs (file-seq (file "resources"))]
+  (let [fs (file-seq (file *data-dir*))]
     (doseq [f (next fs)]
       (doseq [t (read-string (slurp f))] (decode t))
       (take-screenshot driver f))))
+
+(defn run [data-d]
+  (binding [*data-dir* data-d
+            *test-out* (writer (str (date) "-tests.txt"))] 
+    (run-tests 'crison.core)))
