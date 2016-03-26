@@ -74,7 +74,7 @@
       (doseq [t (read-string (slurp f))] (decode t))
       (take-screenshot driver f))))
 
-(defn run [input-d output-d]
+(defn drive [input-d output-d]
   (binding [*input-dir* input-d
             *output-dir* output-d
             *test-out* (writer (str output-d (date) "-tests.txt"))] 

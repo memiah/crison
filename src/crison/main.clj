@@ -1,5 +1,5 @@
 (ns crison.main
-  (:require [crison.core :refer [run]])
+  (:require [crison.core :refer [drive]])
   (:gen-class))
 
-(defn -main [& args] (run "resources" "./"))
+(defn -main [& args] (drive "resources" "./"))
