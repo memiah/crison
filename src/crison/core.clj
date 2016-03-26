@@ -1,11 +1,12 @@
 (ns crison.core
-  (:require [environ.core :refer [env]]
+  (:require [clojure.java.io :refer [file writer]]
             [clojure.test :refer [deftest is run-tests *test-out*]]
             [clj-time.core :as t]
             [clj-time.format :as f]
+            [environ.core :refer [env]]
             [webdriver.core :as wc]
             [webdriver.form :as wf]
-            [clojure.java.io :refer [file writer]]))
+            [me.rossputin.diskops :as do]))
 
 (System/setProperty "phantomjs.binary.path" (env :phantom-path))
 
@@ -69,8 +70,8 @@
 
 (deftest tests
   (wc/resize driver {:width 1024 :height 800})
-  (let [fs (file-seq (file *input-dir*))]
-    (doseq [f (next fs)]
+  (let [fs (do/filter-exts (file-seq (file *input-dir*)) ["csn"])]
+    (doseq [f fs]
       (doseq [t (read-string (slurp f))] (decode t))
       (take-screenshot driver f))))
 

@@ -12,7 +12,8 @@
                  [com.codeborne/phantomjsdriver "1.2.1"
                    :exclusion [org.seleniumhq.selenium/selenium-java
                                org.seleniumhq.selenium/selenium-server
-                               org.seleniumhq.selenium/selenium-remote-driver]]]
+                               org.seleniumhq.selenium/selenium-remote-driver]]
+                 [me.rossputin/diskops "0.4.1"]]
 
   :aot :all
   :main crison.main)
