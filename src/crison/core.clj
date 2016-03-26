@@ -77,5 +77,5 @@
 (defn run [input-d output-d]
   (binding [*input-dir* input-d
             *output-dir* output-d
-            *test-out* (writer (str (date) "-tests.txt"))] 
+            *test-out* (writer (str output-d (date) "-tests.txt"))] 
     (run-tests 'crison.core)))
