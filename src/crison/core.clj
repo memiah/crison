@@ -9,7 +9,8 @@
 
 (System/setProperty "phantomjs.binary.path" (env :phantom-path))
 
-(def ^:dynamic *data-dir*)
+(def ^:dynamic *input-dir*)
+(def ^:dynamic *output-dir*)
 
 (def driver (wc/new-webdriver {:browser :phantomjs}))
 (def built-in-formatter (f/formatters :basic-date-time))
@@ -63,22 +64,18 @@
 
 (defn take-screenshot
   [driver f]
-  (let [s-file (str (date) "_" (.getName f) "-screenshot.png")]
-    (wc/get-screenshot driver :file s-file))
-
-
-  ;; the following will throw an exception if deletion fails, hence our test
-                                        ;(clojure.java.io/delete-file screenshot-file)
-  )
+  (let [s-file (str *output-dir* (date) "_" (.getName f) "-screenshot.png")]
+    (wc/get-screenshot driver :file s-file)))
 
 (deftest tests
   (wc/resize driver {:width 1024 :height 800})
-  (let [fs (file-seq (file *data-dir*))]
+  (let [fs (file-seq (file *input-dir*))]
     (doseq [f (next fs)]
       (doseq [t (read-string (slurp f))] (decode t))
       (take-screenshot driver f))))
 
-(defn run [data-d]
-  (binding [*data-dir* data-d
+(defn run [input-d output-d]
+  (binding [*input-dir* input-d
+            *output-dir* output-d
             *test-out* (writer (str (date) "-tests.txt"))] 
     (run-tests 'crison.core)))

@@ -2,4 +2,4 @@
   (:require [crison.core :refer [run]])
   (:gen-class))
 
-(defn -main [& args] (run "resources"))
+(defn -main [& args] (run "resources" "./"))
