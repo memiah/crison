@@ -32,10 +32,6 @@
 ;; currently a catchall from the multimethod
 (defn ? [x] (is (-> driver (wc/find-element x) wc/exists?) (str "Fail on : " x)))
 
-(defn text? [x]
-  (is (= (:text? x)
-        (wc/text (-> driver (wc/find-element (dissoc x :text?)))))))
-
 (defmulti decode (fn[x] (ffirst x)))
 
 (defmethod decode :url! [x] (go (:url! x)))
