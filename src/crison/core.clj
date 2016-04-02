@@ -65,7 +65,7 @@
 
 (defn take-screenshot
   [driver f]
-  (let [s-file (str *output-dir* (date) "_" (.getName f) "-screenshot.png")]
+  (let [s-file (str *output-dir* "/" (date) "_" (.getName f) "-screenshot.png")]
     (wc/get-screenshot driver :file s-file)))
 
 (deftest tests
@@ -78,5 +78,5 @@
 (defn drive [input-d output-d]
   (binding [*input-dir* input-d
             *output-dir* output-d
-            *test-out* (writer (str output-d (date) "-tests.txt"))] 
+            *test-out* (writer (str output-d "/" (date) "-tests.txt"))]
     (run-tests 'crison.core)))
