@@ -11,13 +11,15 @@ A data language for mining data out of websites and webservices (maybe others in
 
 # Usage
 
-* Build a sample crison data file
+* Build a sample crison data file with a `.csn` extension
 ```
 {:url! "http://www.somedomain.com"}
 {:id "logo"}
 {:tag :h2, :text "Home"}
 {:click! "magicButton"}
 ```
-* Place crison data file in a 'resources' directory in the root of this project
+* Place crison data file in a directory of your choice relative to this project
 * Edit the value of PHANTOM_PATH in the run.sh file
-* Execute `./run.sh` in your shell in the root directory of this installation
+* In the shell in the root of this project execute one of the following
+  * `./run.sh input-dir output-dir`  (csn files are in input-dir)
+  * `./run.sh input-dir`             (if no second param output-dir is input-dir)
