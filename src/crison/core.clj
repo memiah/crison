@@ -55,8 +55,6 @@
 
 (defmethod decode :title [x] (title? (:title x)))
 
-(defmethod decode :text? [x] (text? x))
-
 (defmethod decode :default [x] (? x))
 
 (defn take-screenshot
