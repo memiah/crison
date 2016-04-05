@@ -36,3 +36,32 @@ Screenshots can be taken on any state changing directives:
 {:tag :h2, :text "Home"}
 {:click! "magicButton" :screenshot "pressed-the-magic-button"}
 ```
+
+Simple forms with decent structural markup and have multi fields filled:
+```
+{:fill!
+ [{"field-1" "Thatcham"}
+  {"field-2" "Camberley"}]
+ :screenshot "fill-form"}
+```
+
+Fields can be cleared first:
+```
+{:fill!
+ [{"field-1" clear}
+  {"field-1" "Thatcham"}
+  {"field-2" clear}
+  {"field-2" "Camberley"}]
+ :screenshot "search"}
+```
+
+Where structural markup is not so good on forms we can select over a sequence of
+attributes to try to guarantee uniqueness.  Oh and we can combine filling with
+submitting (the last item in the array will indicates the submit element):
+```
+{:fill-submit!
+ [{:text! "MySearchTerm1" :tag :input :placeholder "Enter your searchterm 1"}
+  {:text! "MySearchTerm2" :tag :input :placeholder "Enter your searchterm 2"}
+  {:value "Search" :class "mypage-search-submit"}]
+ :screenshot "main-search"}
+```
