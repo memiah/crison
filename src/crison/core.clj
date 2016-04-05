@@ -14,6 +14,7 @@
 (def ^:dynamic *input-dir*)
 (def ^:dynamic *output-dir*)
 
+(def def-pause 1000)
 (def driver (wc/new-webdriver {:browser :phantomjs}))
 (def built-in-formatter (f/formatters :basic-date-time))
 
@@ -51,6 +52,7 @@
 
 (defmethod decode :url! [x]
   (go (:url! x))
+  (Thread/sleep (or (:pause x) def-pause))
   (screenshot (:screenshot x))
   (source (:source x)))
 
@@ -59,7 +61,7 @@
     (if (string? e)
       (-> driver (wc/find-element {:id e}) wc/click)
       (-> driver (wc/find-element e) wc/click))
-    (Thread/sleep 2000)
+    (Thread/sleep (or (:pause x) def-pause))
     (screenshot (:screenshot x))
     (source (:source x))))
 
@@ -70,19 +72,19 @@
             field (dissoc e :text!)]
         (-> driver (wc/find-element field) (wc/input-text txt-val))))))
 
-(defmethod decode :fill-submit! [{:keys [fill-submit!] :as x}]
+(defmethod decode :fill-submit! [{:keys [fill-submit! pause] :as x}]
   (if (seq (filter #(:text! %) (butlast fill-submit!)))
     (compute-fill x)
     (wf/quick-fill-submit driver (:fill! x)))
   (-> driver (wc/find-element (last fill-submit!)) wc/click)
-  (Thread/sleep 2000)
+  (Thread/sleep (or pause def-pause))
   (screenshot (:screenshot x)))
 
-(defmethod decode :fill! [{:keys [fill!] :as x}]
+(defmethod decode :fill! [{:keys [fill! pause] :as x}]
   (if (seq (filter #(:text! %) (butlast fill!)))
     (compute-fill x)
     (wf/quick-fill-submit driver (:fill! x)))
-  (Thread/sleep 2000)
+  (Thread/sleep (or pause def-pause))
   (screenshot (:screenshot x)))
 
 (defmethod decode :title [x] (title? (:title x)))

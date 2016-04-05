@@ -26,6 +26,19 @@ A data language for mining data out of websites and webservices (maybe others in
 
 # Examples
 
+## Pause after changing the state of the app
+
+It is possible to configure a delay before screenshotting or moving on in the
+app after a click or a form submission:
+```
+{:fill-submit!
+ [{:text! "setThisText" :tag :input :placeholder "Enter your text"}
+  {:value "Search" :class "page-submit"}]
+ :pause 2000 :screenshot "my-page" :source "my-page-search"}
+```
+A default of 1 second is set on all 'directives'; :url!, :click! etc.
+The value is an Integer in milliseconds.
+
 ## Screenshots
 
 Screenshots can be taken on any state changing directives:
