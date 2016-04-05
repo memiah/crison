@@ -57,7 +57,7 @@ Fields can be cleared first:
 
 Where structural markup is not so good on forms we can select over a sequence of
 attributes to try to guarantee uniqueness.  Oh and we can combine filling with
-submitting (the last item in the array will indicates the submit element):
+submitting (the last item in the array indicates the submit element):
 ```
 {:fill-submit!
  [{:text! "MySearchTerm1" :tag :input :placeholder "Enter your searchterm 1"}
