@@ -1,4 +1,4 @@
-(defproject crison "0.3.0-SNAPSHOT"
+(defproject crison "0.4.0-SNAPSHOT"
   :description "A data language for driving websites"
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.7.0"]
