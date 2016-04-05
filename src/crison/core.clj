@@ -75,6 +75,7 @@
     (compute-fill x)
     (wf/quick-fill-submit driver (:fill! x)))
   (-> driver (wc/find-element (last fill-submit!)) wc/click)
+  (Thread/sleep 2000)
   (screenshot (:screenshot x)))
 
 (defmethod decode :fill! [{:keys [fill!] :as x}]
