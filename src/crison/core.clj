@@ -29,6 +29,13 @@
       (wc/get-screenshot driver :file s-file)))
   ([] (screenshot nil)))
 
+(defn source
+  ([name]
+   (let [nm (if name (str "-" name) "")
+         s-file (str *output-dir* "/" (date) "_" (.getName *crison-file*) "-source" nm ".txt")]
+      (spit s-file (wc/page-source driver))))
+  ([] (source nil)))
+
 (defn title [] (wc/title driver))
 
 (defn title? [x] (is (= x (title)) x))
@@ -42,7 +49,10 @@
 
 (defmulti decode (fn[x] (ffirst x)))
 
-(defmethod decode :url! [x] (go (:url! x)) (screenshot (:screenshot x)))
+(defmethod decode :url! [x]
+  (go (:url! x))
+  (screenshot (:screenshot x))
+  (source (:source x)))
 
 (defmethod decode :click! [x]
   (let [e (:click! x)]
@@ -50,11 +60,11 @@
       (-> driver (wc/find-element {:id e}) wc/click)
       (-> driver (wc/find-element e) wc/click))
     (Thread/sleep 2000)
-    (screenshot (:screenshot x))))
+    (screenshot (:screenshot x))
+    (source (:source x))))
 
 (defn compute-fill [{:keys [fill-submit!] :as x}]
   (let [head (butlast fill-submit!)]
-    (println "head : " head)
     (doseq [e head]
       (let [txt-val (:text! e)
             field (dissoc e :text!)]
@@ -84,7 +94,8 @@
     (doseq [f fs]
       (binding [*crison-file* f]
         (doseq [t (read-string (slurp f))] (decode t))
-        (screenshot)))))
+        (screenshot)
+        (source)))))
 
 (defn drive [input-d output-d]
   (binding [*input-dir* input-d
