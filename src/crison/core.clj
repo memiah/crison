@@ -52,16 +52,27 @@
     (Thread/sleep 2000)
     (screenshot (:screenshot x))))
 
-(defmethod decode :submit! [{:keys [submit!] :as x}]
-  (let [input (first submit!)
-        v (:text! input)
-        srch (dissoc input :text!)]
-        (-> driver (wc/find-element srch) (wc/input-text v))
-        (-> driver (wc/find-element (last submit!)) wc/click)
-        (screenshot (:screenshot x))))
+(defn compute-fill [{:keys [fill-submit!] :as x}]
+  (let [head (butlast fill-submit!)]
+    (println "head : " head)
+    (doseq [e head]
+      (let [txt-val (:text! e)
+            field (dissoc e :text!)]
+        (-> driver (wc/find-element field) (wc/input-text txt-val))))))
 
-(defmethod decode :search! [x]
-  (wf/quick-fill-submit driver (:search! x)) (Thread/sleep 2000) (screenshot (:screenshot x)))
+(defmethod decode :fill-submit! [{:keys [fill-submit!] :as x}]
+  (if (seq (filter #(:text! %) (butlast fill-submit!)))
+    (compute-fill x)
+    (wf/quick-fill-submit driver (:fill! x)))
+  (-> driver (wc/find-element (last fill-submit!)) wc/click)
+  (screenshot (:screenshot x)))
+
+(defmethod decode :fill! [{:keys [fill!] :as x}]
+  (if (seq (filter #(:text! %) (butlast fill!)))
+    (compute-fill x)
+    (wf/quick-fill-submit driver (:fill! x)))
+  (Thread/sleep 2000)
+  (screenshot (:screenshot x)))
 
 (defmethod decode :title [x] (title? (:title x)))
 
