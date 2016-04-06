@@ -68,9 +68,12 @@
 (defn compute-fill [{:keys [fill-submit!] :as x}]
   (let [head (butlast fill-submit!)]
     (doseq [e head]
-      (let [txt-val (:text! e)
-            field (dissoc e :text!)]
-        (-> driver (wc/find-element field) (wc/input-text txt-val))))))
+      (if (:clear! e)
+        (let [field (dissoc e :clear!)]
+          (-> driver (wc/find-element field) (wc/clear)))
+        (let [txt-val (:text! e)
+              field (dissoc e :text!)]
+          (-> driver (wc/find-element field) (wc/input-text txt-val)))))))
 
 (defmethod decode :fill-submit! [{:keys [fill-submit! pause] :as x}]
   (if (seq (filter #(:text! %) (butlast fill-submit!)))
