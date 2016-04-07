@@ -73,10 +73,19 @@ submitting (the last item in the array indicates the submit element):
 
 ```
 {:fill-submit!
- [{:text! "MySearchTerm1" :tag :input :placeholder "Enter your searchterm 1"}
-  {:text! "MySearchTerm2" :tag :input :placeholder "Enter your searchterm 2"}
+ [{:text! "MySearchTerm1" :tag :input :placeholder "Enter your search term 1"}
+  {:text! "MySearchTerm2" :tag :input :placeholder "Enter your search term 2"}
   {:value "Search" :class "mypage-search-submit"}]
  :screenshot "main-search"}
+```
+
+Once again fields can be cleared first:
+
+```
+{:fill-submit!
+ [{:clear! "" :tag :input :placeholder "Enter your search term 1"}
+  {:text! "York" :tag :input :placeholder "Enter your search term 1"}
+  {:value "Search" :class "mypage-search-submit"}]}
 ```
 
 
