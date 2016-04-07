@@ -127,3 +127,12 @@ Page source code can be dumped on any of the state changing directives:
   {:value "Search" :class "page-submit"}]
  :pause 2000 :source "form-submitted"}
 ```
+
+## Contributing
+
+All contributions ideas/pull requests/bug reports are welcome, we hope you find it useful.
+
+
+## License
+
+Crison is licensed with Apache License v2.0.
