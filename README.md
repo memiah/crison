@@ -25,7 +25,7 @@ A data language for mining data out of websites and webservices (maybe others in
 ## Move to url
 
 ```
-{:url! "http://www.somedomain.com"}
+{:url! "http://www.example.com"}
 ```
 
 
@@ -94,7 +94,7 @@ Once again fields can be cleared first:
 Screenshots can be taken on any state changing directives:
 
 ```
-{:url! "http://www.somedomain.com" :screenshot "arrived-on-homepage"}
+{:url! "http://www.example.com" :screenshot "arrived-on-homepage"}
 {:id "logo"}
 {:tag :h2, :text "Home"}
 {:click! "magicButton" :screenshot "pressed-the-magic-button"}
