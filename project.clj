@@ -14,6 +14,6 @@
                                org.seleniumhq.selenium/selenium-server
                                org.seleniumhq.selenium/selenium-remote-driver]]
                  [me.rossputin/diskops "0.4.1"]]
-
+  :uberjar-name "crison-standalone.jar"
   :aot :all
   :main crison.main)
