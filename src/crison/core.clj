@@ -1,11 +1,14 @@
 (ns crison.core
   (:require [clojure.java.io :refer [file writer]]
+            [clojure.set :refer [intersection]]
+            [clojure.string :refer [replace]]
             [clojure.test :refer [deftest is run-tests *test-out*]]
             [clj-time.core :as t]
             [clj-time.format :as f]
             [environ.core :refer [env]]
-            [webdriver.core :as wc]
-            [webdriver.form :as wf]
+            [clj-webdriver.core :as wc]
+            [clj-webdriver.form-helpers :as wf]
+            [clj-webdriver.window :refer :all]
             [me.rossputin.diskops :as do]))
 
 (System/setProperty "phantomjs.binary.path" (env :phantom-path))
@@ -15,10 +18,10 @@
 (def ^:dynamic *output-dir*)
 
 (def def-pause 1000)
-(def driver (delay (wc/new-webdriver {:browser :phantomjs})))
+(def driver (delay (wc/new-driver {:browser :phantomjs})))
 (def built-in-formatter (f/formatters :basic-date-time))
 
-(defn int [s] (Integer. (re-find  #"\d+" s )))
+(defn int [x] (if (string? x) (Integer. (re-find  #"\d+" x)) x))
 
 (defn date []
   (let [nlocal (t/to-time-zone (t/now) (t/time-zone-for-offset -0))]
@@ -64,47 +67,47 @@
   (source (:source x)))
 
 (defmethod decode :click! [x]
-  (println "x : " x)
-  (println ":click! x " (:click! x))
   (let [e (:click! x)
-        orig-handles (count (wc/window-handles @driver))]
-    (println "e : " e)
+        href (or (get-in e [:href]) e)
+        orig-handles (count (wc/windows @driver))]
     (if (string? e)
       (-> @driver (wc/find-element {:id e}) wc/click)
       (-> @driver (wc/find-element e) wc/click))
+    (when (> (count (wc/windows @driver)) orig-handles)
+    (let [w (or (wc/find-window @driver {:url href})
+                (wc/find-window @driver {:url (replace href #"http" "https")})
+                (wc/find-window @driver {:url (-> href (replace #"http" "https") (replace #"www." ""))}))]
+      (wc/switch-to-window @driver w)))
     (render-pause (or (:pause x) def-pause))
-    (when (> (count (wc/window-handles @driver)) orig-handles)
-      (wc/switch-to-other-window @driver))
     (screenshot (:screenshot x))
     (source (:source x))))
 
-(defn compute-fill [{:keys [fill-submit!] :as x}]
-  (let [head (butlast fill-submit!)]
-    (doseq [e head]
-      (if (:clear! e)
-        (let [field (dissoc e :clear!)]
-          (-> @driver (wc/find-element field) (wc/clear)))
-        (let [txt-val (:text! e)
-              field (dissoc e :text!)]
-          (-> @driver (wc/find-element field) (wc/input-text txt-val)))))))
+(defn compute-fill [x fill-mode]
+  (let [xs (if (= fill-mode :fill-submit) (butlast (:fill-submit! x)) (:fill! x))]
+    (doseq [e xs]
+      (cond
+        (:clear! e) (let [field (dissoc e :clear!)]
+                      (-> @driver (wc/find-element field) (wc/clear)))
+        (:select! e) (let [sel-val (:select! e)
+                           field (dissoc e :select!)]
+                      (-> @driver (wc/find-element field) (wc/select-by-value sel-val)))
+        :else (let [txt-val (:text! e)
+                    field (dissoc e :text!)]
+                (-> @driver (wc/find-element field) (wc/input-text txt-val)))))))
 
 (defmethod decode :fill-submit! [{:keys [fill-submit! pause] :as x}]
-  (if (seq (filter #(:text! %) (butlast fill-submit!)))
-    (compute-fill x)
-    (wf/quick-fill-submit @driver (:fill! x)))
+  (if (seq (filter #(intersection #{:clear! :select! :text!} (set (keys %))) (butlast fill-submit!)))
+    (compute-fill x :fill-submit)
+    (wf/quick-fill @driver (:fill! x)))
   (-> @driver (wc/find-element (last fill-submit!)) wc/click)
-  (println "pause x : " (:pause x))
-  (println "type pause x : " (type (:pause x)))
-  (println "def-pause : " def-pause)
-  (println "type def-pause : " (type def-pause))
-  (render-pause (or (:pause x) def-pause))
+  (render-pause (or pause def-pause))
   (screenshot (:screenshot x)))
 
 (defmethod decode :fill! [{:keys [fill! pause] :as x}]
-  (if (seq (filter #(:text! %) (butlast fill!)))
-    (compute-fill x)
-    (wf/quick-fill-submit @driver (:fill! x)))
-  (render-pause (or (:pause x) def-pause))
+  (if (seq (filter #(intersection #{:clear! :select! :text!} (set (keys %))) fill!))
+    (compute-fill x :fill)
+    (wf/quick-fill @driver (:fill! x)))
+  (render-pause (or pause def-pause))
   (screenshot (:screenshot x)))
 
 (defmethod decode :title [x] (title? (:title x)))
@@ -117,7 +120,7 @@
         fs (do/filter-exts (file-seq (file *input-dir*)) ["csn"])]
     (println "crison-width : " width)
     (println "crison-height : " height)
-    (wc/resize @driver {:width (int width) :height (int height)})
+    (resize @driver {:width (int width) :height (int height)})
     (doseq [f fs]
       (binding [*crison-file* f]
         (doseq [t (read-string (slurp f))] (decode t))
