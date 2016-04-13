@@ -23,10 +23,9 @@
 
 (defn int [x] (if (string? x) (Integer. (re-find  #"\d+" x)) x))
 
-(defn date []
-  (let [nlocal (t/to-time-zone (t/now) (t/time-zone-for-offset -0))]
-    (f/unparse (f/formatter-local "yyyy-MM-dd_hh:mm")
-               nlocal)))
+(def custom-time-formatter (f/with-zone (f/formatter "yyyy-MM-dd_HH:mm:ss")
+                                        (t/default-time-zone)))
+(defn date [] (f/unparse custom-time-formatter (t/now)))
 
 (defn render-pause [pause-ms]
   (when-not (= pause-ms 0)
