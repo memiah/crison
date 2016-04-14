@@ -33,11 +33,10 @@
     (Thread/sleep pause-ms)))
 
 (defn screenshot
-  ([name]
-   (let [nm (if name (str "-" name) "")
-         s-file (str *output-dir* "/" (date) "_" (.getName *crison-file*) "-screenshot" nm ".png")]
-      (wc/get-screenshot @driver :file s-file)))
-  ([] (screenshot nil)))
+  [name]
+  (when name
+    (let [s-file (str *output-dir* "/" (date) "_" (.getName *crison-file*) "-screenshot-" name ".png")]
+      (wc/get-screenshot @driver :file s-file))))
 
 (defn source
   ([name]
@@ -123,7 +122,7 @@
     (doseq [f fs]
       (binding [*crison-file* f]
         (doseq [t (read-string (slurp f))] (decode t))
-        (screenshot)
+        (screenshot "final")
         (source)))))
 
 (defn drive [input-d output-d]
