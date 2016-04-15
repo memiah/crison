@@ -1,7 +1,7 @@
-(defproject crison "0.5.2"
+(defproject crison "0.5.3"
   :description "A data language for driving websites"
   :min-lein-version "2.0.0"
-  :dependencies [[org.clojure/clojure "1.7.0"]
+  :dependencies [[org.clojure/clojure "1.8.0"]
                  [clj-time "0.11.0"]
                  [environ "1.0.2"]
                  [clj-webdriver "0.7.2"]

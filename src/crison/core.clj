@@ -102,7 +102,7 @@
   (screenshot (:screenshot x)))
 
 (defmethod decode :fill! [{:keys [fill! pause] :as x}]
-  (if (seq (filter #(intersection #{:clear! :select! :text!} (set (keys %))) fill!))
+  (if (seq (filter #(seq (intersection #{:clear! :select! :text!} (set (keys %)))) fill!))
     (compute-fill x :fill)
     (wf/quick-fill @driver (:fill! x)))
   (render-pause (or pause def-pause))
