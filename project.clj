@@ -1,10 +1,11 @@
-(defproject crison "0.5.2"
+(defproject crison "0.6.0"
   :description "A data language for driving websites"
   :min-lein-version "2.0.0"
-  :dependencies [[org.clojure/clojure "1.7.0"]
+  :dependencies [[org.clojure/clojure "1.8.0"]
                  [clj-time "0.11.0"]
                  [environ "1.0.2"]
                  [clj-webdriver "0.7.2"]
+                 [com.taoensso/timbre "4.2.1"]
                  [org.seleniumhq.selenium/selenium-server "2.47.1"]
                  ;; Needed by core code
                  [org.seleniumhq.selenium/selenium-java "2.47.0"]
