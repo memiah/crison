@@ -8,13 +8,14 @@
             [environ.core :refer [env]]
             [clj-webdriver.core :as wc]
             [clj-webdriver.form-helpers :as wf]
-            [clj-webdriver.window :refer :all]
-            [me.rossputin.diskops :as do]))
+            [clj-webdriver.window :refer :all])
+  (:use [taoensso.timbre :as timbre :only (trace debug info warn error)])
+  (:refer-clojure :exclude [int replace]))
 
 (System/setProperty "phantomjs.binary.path" (env :phantom-path))
 
 (def ^:dynamic *crison-file*)
-(def ^:dynamic *input-dir*)
+(def ^:dynamic *crisons*)
 (def ^:dynamic *output-dir*)
 
 (def def-pause 1000)
@@ -32,16 +33,17 @@
     (println "pausing for : " pause-ms " ms")
     (Thread/sleep pause-ms)))
 
+;; TODO can not do this when using S3 inputs
 (defn screenshot
   [name]
   (when name
-    (let [s-file (str *output-dir* "/" (date) "_" (.getName *crison-file*) "-screenshot-" name ".png")]
+    (let [s-file (str *output-dir* "/" (date) "_"  "-screenshot-" name ".png")]
       (wc/get-screenshot @driver :file s-file))))
 
 (defn source
   ([name]
    (let [nm (if name (str "-" name) "")
-         s-file (str *output-dir* "/" (date) "_" (.getName *crison-file*) "-source" nm ".txt")]
+         s-file (str *output-dir* "/" (date) "_" "-source" nm ".txt")]
       (when name (spit s-file (wc/page-source @driver)))))
   ([] (source nil)))
 
@@ -114,19 +116,25 @@
 
 (deftest tests
   (let [width (env :crison-width 1024)
-        height (env :crison-height 800)
-        fs (do/filter-exts (file-seq (file *input-dir*)) ["csn"])]
+        height (env :crison-height 800)]
     (println "crison-width : " width)
     (println "crison-height : " height)
     (resize @driver {:width (int width) :height (int height)})
-    (doseq [f fs]
+    (doseq [f *crisons*]
       (binding [*crison-file* f]
+        (println "*crison-file : " *crison-file*)
         (doseq [t (read-string (slurp f))] (decode t))
         (screenshot "final")
         (source)))))
 
-(defn drive [input-d output-d]
-  (binding [*input-dir* input-d
-            *output-dir* output-d
-            *test-out* (writer (str output-d "/" (date) "-tests.txt"))]
+(defn drive
+  "if bucket exists we are using s3
+   crisons is a sequence of crison files to drive
+   output-dir is where we write our test results and artefacts to"
+  [crisons out-dir]
+  (debug "crisons : " crisons)
+  (debug "out-dir : " out-dir)
+  (binding [*crisons* crisons
+            *output-dir* out-dir
+            *test-out* (writer (str out-dir "/" (date) "-tests.txt"))]
     (run-tests 'crison.core)))
