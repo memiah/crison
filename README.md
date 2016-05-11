@@ -88,6 +88,15 @@ Once again fields can be cleared first:
   {:value "Search" :class "mypage-search-submit"}]}
 ```
 
+## CSS Selectors to get elements
+
+```
+[
+ {:url! "http://localhost/tricky.html" :pause 200 :screenshot "tricky"}
+ {:css "div.goober h1"}
+ {:css "div.fail h1"}
+]
+```
 
 ## Screenshots
 
