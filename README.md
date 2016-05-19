@@ -28,6 +28,30 @@ A data language for mining data out of websites and webservices (maybe others in
 {:url! "http://www.example.com"}
 ```
 
+## Assertions
+
+### Element present assertions (including exact text value match)
+
+Used to determine if specific elements are present in the document.
+Can be used to determine if elements have exact text value also.
+Below we check if there is an element present with id "logo".
+
+```
+{:id "logo"}
+```
+
+Below we check if there is a title element with the exact text "Example Domain".
+
+```
+ {:tag :title :text "Example Domain"}
+```
+
+Below we check if there is an h2 element present with the exact text "Home".
+
+```
+{:tag :h2, :text "Home"}
+```
+
 
 ## Click on a link or button
 
