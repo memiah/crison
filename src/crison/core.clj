@@ -47,10 +47,6 @@
       (when name (spit s-file (wc/page-source @driver)))))
   ([] (source nil)))
 
-(defn title [] (wc/title @driver))
-
-(defn title? [x] (is (= x (title)) x))
-
 (defn go [x] (wc/to @driver x))
 
 (defn el [x] (-> @driver (wc/find-element x)))
@@ -110,7 +106,12 @@
   (render-pause (or pause def-pause))
   (screenshot (:screenshot x)))
 
-(defmethod decode :title [x] (title? (:title x)))
+(defmethod decode :match [{:keys [match text]}]
+  (let [el (if (string? match)
+             (-> @driver (wc/find-element {:id match}))
+             (-> @driver (wc/find-element match)))
+        textval (wc/text el)]
+    (is (= true (.contains textval text)) (str "Fail on match for element : " match ", substring : " text))))
 
 (defmethod decode :default [x] (? x))
 
